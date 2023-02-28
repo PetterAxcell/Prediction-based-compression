@@ -27,7 +27,7 @@ print("The version is:")
 print(tf.__version__)
 EPOCH =300
 BATCH = 5
-X = 300
+X = 500
 Y = 50
 maxValueHist = 2500
 minValueHist = -2500
@@ -129,7 +129,7 @@ tf.keras.backend.set_floatx('float64')
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=name, histogram_freq=1, profile_batch = 0)
 for BAND in range(5, 200):
     try:
-        featuresValues, targetValues = matrix_array_onelayer3(BAND, img[:, :512, :680], vector, 3, 3, X)
+        featuresValues, targetValues = matrix_array_onelayer3(BAND, img[:, :400, :], vector, 3, 3, X)
 
         #==============================================================================
         #=========================== NEURONAL NETWORK =================================
@@ -177,7 +177,7 @@ for BAND in range(5, 200):
         model.add(layers.Dense(units = 5001, activation = tf.nn.relu, use_bias=True))
         model.add(layers.Dense(units = rangeV,  activation = tf.nn.softmax, use_bias=True))
         model.compile(optimizer='adam', loss=tf.keras.losses.CategoricalCrossentropy(), metrics=['accuracy'])
-        historial = model.fit(featuresValues, targetValues2, epochs=10, batch_size=5000, callbacks=[tensorboard_callback])
+        historial = model.fit(featuresValues, targetValues2, epochs=30, batch_size=5000, callbacks=[tensorboard_callback])
         model.summary()
         score = model.evaluate(featuresValues, targetValues2, verbose=0)
         print(f'Test loss: {score[0]} / Test accuracy: {score[1]}')
@@ -195,6 +195,14 @@ for BAND in range(5, 200):
         print("=========================================")
         print("=========================================")
         print("=========================================")
+
+        featuresValues, targetValues = matrix_array_onelayer3(BAND, img[:, :400, :], vector, 3, 3, X)
+        # Features Normalization
+        featuresValues = np.clip(featuresValues, minValueHist, maxValueHist)
+        featuresValues = featuresValues/2**12
+        targetValues = np.reshape(targetValues, (targetValues.shape[0],1))
+        featuresValues = tf.convert_to_tensor(featuresValues, dtype=tf.float64)
+
 
         ArraypredictValue = []
         count = 0
